@@ -2,6 +2,14 @@
 
 This project is a comprehensive example of creating **IPSec VPN connections** in iOS applications using the NetworkExtension framework.
 
+## 🚀 Ready-to-Use Code
+
+**All code is consolidated in 2 main files:**
+- 📱 **UIKit**: `forUse/UIKitControllers.swift` (All 3 controllers)
+- 🎨 **SwiftUI**: `forUse/VPNSwiftUIViews.swift` (All 4 views + Manager)
+
+Each file includes complete examples and documentation - just copy and use!
+
 ## ⚠️ Important Notice
 
 **This implementation works ONLY with IPSec protocol. It does NOT work with IKEv2.**
@@ -26,12 +34,42 @@ All other fields in the Country model (id, name) are **optional** and used only 
   - [1. KeychainService - Secure Data Storage](#1-keychainservice---secure-data-storage)
   - [2. VPN Class - Main VPN Management](#2-vpn-class---main-vpn-management)
   - [3. Country Model - Server Management](#3-country-model---server-management)
-  - [4. Controllers - User Interface](#4-controllers---user-interface)
+  - [4. Controllers - User Interface (UIKit)](#4-controllers---user-interface-uikit)
+  - [5. SwiftUI Views - Modern UI Implementation](#5-swiftui-views---modern-ui-implementation)
+- [VPN Server Setup](#vpn-server-setup)
 - [Installation and Configuration](#installation-and-configuration)
 - [Usage Examples](#usage-examples)
+- [SwiftUI Usage Examples](#swiftui-usage-examples)
 - [Monitoring VPN Status](#monitoring-vpn-status)
 - [Important Notes](#important-notes)
 - [Security](#security)
+
+## 📦 New Consolidated File Structure
+
+**All UIKit and SwiftUI code has been consolidated into single files for easier management!**
+
+### Quick Start - Which Files to Use:
+
+#### For UIKit Development:
+- **Use**: `forUse/UIKitControllers.swift` (All 3 controllers in one file)
+- Contains: `HomeController`, `VpnConfigrationController`, `SelectCountryController`
+- Includes: Complete UIKit examples and documentation
+
+#### For SwiftUI Development:
+- **Use**: `forUse/VPNSwiftUIViews.swift` (All views in one file)
+- Contains: `VPNManager`, `HomeView`, `SelectCountryView`, `VPNConfigurationView`
+- Includes: Complete SwiftUI examples and documentation
+
+#### Core Files (Required for Both):
+- `KeychainHelper.swift` - Keychain service
+- `vpnServer.swift` - VPN connection class
+- `Country.swift` - Server model
+
+### Optional Cleanup:
+The original individual controller files can be **safely deleted** as all code is now consolidated:
+- ~~`forUse/HomeController.swift`~~ → Now in `UIKitControllers.swift`
+- ~~`forUse/VpnConfigrationController.swift`~~ → Now in `UIKitControllers.swift`
+- ~~`forUse/SelectCountryController.swift`~~ → Now in `UIKitControllers.swift`
 
 ## Features
 
@@ -44,6 +82,8 @@ All other fields in the Country model (id, name) are **optional** and used only 
 - ✅ Real-time VPN status monitoring
 - ✅ Premium/Free server differentiation (optional UI feature)
 - ✅ On-demand VPN support
+- ✅ **Consolidated codebase** - All UIKit controllers in one file
+- ✅ **Modern SwiftUI implementation** - All views in one file
 
 ## Requirements
 
@@ -66,13 +106,17 @@ You need to enable the following capabilities in your project:
 ```
 vpnPacket/
 ├── KeychainHelper.swift              # Keychain data storage service
-├── vpnServer.swift              # Main VPN connection class
-├── Country.swift                # Server model
+├── vpnServer.swift                   # Main VPN connection class
+├── Country.swift                     # Server model
 └── forUse/
-    ├── HomeController.swift            # Main screen and VPN control
-    ├── VpnConfigrationController.swift # VPN initial setup screen
-    └── SelectCountryController.swift   # Server selection screen
+    ├── UIKitControllers.swift          # All UIKit controllers in one file (NEW)
+    ├── VPNSwiftUIViews.swift          # All SwiftUI views in one file (NEW)
+    ├── HomeController.swift            # Original - Main screen (can be removed)
+    ├── VpnConfigrationController.swift # Original - Initial setup (can be removed)
+    └── SelectCountryController.swift   # Original - Server selection (can be removed)
 ```
+
+**Note:** The original individual controller files (`HomeController.swift`, `VpnConfigrationController.swift`, `SelectCountryController.swift`) are kept for reference but can be safely deleted as all their code is now in `UIKitControllers.swift`.
 
 ## Core Components
 
@@ -401,7 +445,9 @@ for country in countries {
 }
 ```
 
-### 4. Controllers - User Interface
+### 4. Controllers - User Interface (UIKit)
+
+**All UIKit controllers are now consolidated in `forUse/UIKitControllers.swift`**
 
 #### HomeController - Main Screen
 
@@ -533,7 +579,7 @@ class HomeController: UIViewController {
 
 Used to request permission from the user when VPN is set up for the first time.
 
-**Key features shown in VpnConfigrationController.swift:**
+**Key features (now in UIKitControllers.swift):**
 
 - First-time VPN profile creation
 - User permission flow
@@ -629,6 +675,166 @@ class SelectCountryController: UIViewController {
     }
 }
 ```
+
+### 5. SwiftUI Views - Modern UI Implementation
+
+All UIKit controllers have been reimplemented in **SwiftUI** for modern iOS development. The SwiftUI implementation is located in `forUse/VPNSwiftUIViews.swift`.
+
+#### VPNManager - Observable Object
+
+The `VPNManager` class is an `ObservableObject` that manages VPN state for SwiftUI views.
+
+**Key features:**
+
+- Real-time VPN status monitoring with `@Published` properties
+- Automatic UI updates when connection state changes
+- Connection timer tracking
+- Server switching capabilities
+
+```swift
+class VPNManager: ObservableObject {
+    @Published var connectionStatus: NEVPNStatus = .invalid
+    @Published var connectionTime: String = "00:00:00"
+    @Published var isConnected: Bool = false
+    @Published var isConnecting: Bool = false
+    @Published var selectedCountry: Country?
+    @Published var countries: [Country] = []
+
+    func connect() { /* ... */ }
+    func disconnect() { /* ... */ }
+    func switchServer(to country: Country) { /* ... */ }
+}
+```
+
+#### HomeView - Main VPN Screen (SwiftUI)
+
+SwiftUI version of `HomeController` with modern UI design.
+
+**Features:**
+
+- Gradient background with smooth animations
+- Real-time status updates
+- Connection timer display
+- Server selection sheet
+- Configuration flow for first-time setup
+
+```swift
+struct HomeView: View {
+    @StateObject private var vpnManager = VPNManager()
+    @State private var showServerSelection = false
+    @State private var showConfiguration = false
+
+    var body: some View {
+        NavigationView {
+            // Beautiful gradient background with status, timer, and controls
+        }
+    }
+}
+```
+
+#### SelectCountryView - Server Selection (SwiftUI)
+
+SwiftUI version of `SelectCountryController`.
+
+**Features:**
+
+- List of available servers
+- Visual selection indicator
+- Server details (name, IP, username)
+- Quick server switching
+
+```swift
+struct SelectCountryView: View {
+    @ObservedObject var vpnManager: VPNManager
+    @Binding var isPresented: Bool
+
+    var body: some View {
+        NavigationView {
+            List {
+                ForEach(vpnManager.countries, id: \.id) { country in
+                    // Server row with selection indicator
+                }
+            }
+        }
+    }
+}
+```
+
+#### VPNConfigurationView - Initial Setup (SwiftUI)
+
+SwiftUI version of `VpnConfigrationController`.
+
+**Features:**
+
+- First-time VPN profile creation
+- Permission request flow
+- Loading states
+- Error handling with retry
+
+```swift
+struct VPNConfigurationView: View {
+    @ObservedObject var vpnManager: VPNManager
+    @Binding var isPresented: Bool
+    @State private var isLoading = false
+
+    var body: some View {
+        NavigationView {
+            // Configuration screen with server details and allow button
+        }
+    }
+}
+```
+
+## VPN Server Setup
+
+Before using this iOS client, you need a VPN server. You can easily set up your own IPSec VPN server using this excellent guide:
+
+### 🖥️ IPSec VPN Server Installation
+
+**Recommended**: [hwdsl2/setup-ipsec-vpn](https://github.com/hwdsl2/setup-ipsec-vpn)
+
+This repository provides scripts to set up your own IPSec VPN server in just a few minutes on:
+- Ubuntu
+- Debian
+- CentOS
+- Amazon Linux 2
+- Rocky Linux
+- AlmaLinux
+
+**Quick Server Setup:**
+
+```bash
+# For Ubuntu/Debian
+wget https://get.vpnsetup.net -O vpn.sh && sudo sh vpn.sh
+
+# For CentOS/RHEL
+yum -y install wget
+wget https://get.vpnsetup.net -O vpn.sh && sudo sh vpn.sh
+```
+
+After installation, you'll receive:
+- **Server IP Address** → Use in `Country.ip`
+- **IPsec PSK (Shared Secret)** → Use in `Country.shared`
+- **VPN Username** → Use in `Country.userName`
+- **VPN Password** → Use in `Country.pass`
+
+**Docker Alternative:**
+
+```bash
+docker run \
+    --name ipsec-vpn-server \
+    --restart=always \
+    -v ikev2-vpn-data:/etc/ipsec.d \
+    -v /lib/modules:/lib/modules:ro \
+    -p 500:500/udp \
+    -p 4500:4500/udp \
+    -d --privileged \
+    hwdsl2/ipsec-vpn-server
+```
+
+For detailed instructions, visit: https://github.com/hwdsl2/setup-ipsec-vpn
+
+---
 
 ## Installation and Configuration
 
@@ -768,6 +974,209 @@ case .disconnecting:
     print("Unknown state")
 }
 ```
+
+## SwiftUI Usage Examples
+
+### 1. Basic App Setup with SwiftUI
+
+```swift
+import SwiftUI
+
+@main
+struct VPNApp: App {
+    var body: some Scene {
+        WindowGroup {
+            HomeView()
+        }
+    }
+}
+```
+
+### 2. Using VPNManager in Custom Views
+
+```swift
+struct CustomVPNView: View {
+    @StateObject private var vpnManager = VPNManager()
+
+    var body: some View {
+        VStack(spacing: 20) {
+            // Status display
+            Text("Status: \(vpnManager.statusText)")
+                .font(.title)
+
+            // Server info
+            if let country = vpnManager.selectedCountry {
+                Text("Server: \(country.name)")
+                Text("IP: \(country.ip)")
+            }
+
+            // Connection button
+            Button(vpnManager.buttonTitle) {
+                vpnManager.connect()
+            }
+            .disabled(vpnManager.isConnecting)
+
+            // Connection time (when connected)
+            if vpnManager.isConnected {
+                Text(vpnManager.connectionTime)
+                    .font(.system(.largeTitle, design: .monospaced))
+            }
+        }
+    }
+}
+```
+
+### 3. Server List with Quick Connect
+
+```swift
+struct QuickConnectView: View {
+    @StateObject private var vpnManager = VPNManager()
+
+    var body: some View {
+        List(vpnManager.countries, id: \.id) { country in
+            HStack {
+                VStack(alignment: .leading) {
+                    Text(country.name)
+                        .font(.headline)
+                    Text(country.ip)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+
+                Spacer()
+
+                Button("Connect") {
+                    vpnManager.switchServer(to: country)
+                }
+                .buttonStyle(.borderedProminent)
+            }
+            .padding(.vertical, 4)
+        }
+        .navigationTitle("Servers")
+    }
+}
+```
+
+### 4. Status Monitor Widget
+
+```swift
+struct VPNStatusWidget: View {
+    @StateObject private var vpnManager = VPNManager()
+
+    var body: some View {
+        VStack(spacing: 15) {
+            // Animated status indicator
+            Circle()
+                .fill(vpnManager.isConnected ? Color.green : Color.gray)
+                .frame(width: 60, height: 60)
+                .overlay(
+                    Image(systemName: "lock.shield")
+                        .foregroundColor(.white)
+                        .font(.title2)
+                )
+                .shadow(color: vpnManager.isConnected ? .green.opacity(0.5) : .clear, radius: 10)
+
+            Text(vpnManager.statusText)
+                .font(.caption)
+                .foregroundColor(.secondary)
+
+            if vpnManager.isConnected {
+                Text(vpnManager.connectionTime)
+                    .font(.system(.caption, design: .monospaced))
+            }
+        }
+        .padding()
+        .background(Color(.systemBackground))
+        .cornerRadius(15)
+        .shadow(radius: 5)
+    }
+}
+```
+
+### 5. Tab Bar Integration
+
+```swift
+struct MainTabView: View {
+    var body: some View {
+        TabView {
+            HomeView()
+                .tabItem {
+                    Label("VPN", systemImage: "lock.shield.fill")
+                }
+
+            ServerListView()
+                .tabItem {
+                    Label("Servers", systemImage: "server.rack")
+                }
+
+            SettingsView()
+                .tabItem {
+                    Label("Settings", systemImage: "gear")
+                }
+        }
+    }
+}
+```
+
+### 6. Advanced - Custom VPN Manager Subclass
+
+```swift
+class AdvancedVPNManager: VPNManager {
+    @Published var statistics: VPNStatistics?
+    @Published var favoriteServers: [String] = []
+
+    override func connect() {
+        // Add custom logging
+        logConnectionAttempt()
+
+        // Call parent implementation
+        super.connect()
+
+        // Update statistics
+        updateStats()
+    }
+
+    func connectToFastest() {
+        // Custom logic to find fastest server
+        if let fastest = countries.max(by: { $0.signal < $1.signal }) {
+            switchServer(to: fastest)
+        }
+    }
+
+    private func logConnectionAttempt() {
+        print("📊 Connection attempt: \(selectedCountry?.name ?? "unknown")")
+    }
+
+    private func updateStats() {
+        // Your statistics tracking code
+    }
+}
+
+struct VPNStatistics {
+    var totalConnections: Int
+    var totalDataUsed: Int64
+    var lastConnected: Date?
+}
+```
+
+### Key SwiftUI Features:
+
+- ✅ **@StateObject** and **@ObservedObject** for state management
+- ✅ **@Published** properties for reactive updates
+- ✅ **Combine** framework integration
+- ✅ Real-time VPN status monitoring
+- ✅ Smooth animations and transitions
+- ✅ Modern iOS design patterns
+- ✅ Sheet presentations for modals
+- ✅ Built-in error handling
+- ✅ Loading states
+
+### SwiftUI Requirements:
+
+- iOS 14.0+ (for @StateObject and some SwiftUI features)
+- iOS 13.0+ minimum (with @ObservedObject instead)
+- Xcode 12.0+
+- SwiftUI framework
 
 ## Monitoring VPN Status
 
@@ -967,14 +1376,105 @@ if let server = servers.first {
 
 ## File References
 
-- **KeychainHelper.swift** - Keychain service implementation (lines 33-74)
-- **vpnServer.swift:86-126** - Main VPN connection logic
-- **vpnServer.swift:128-169** - VPN configuration save method
-- **vpnServer.swift:182-184** - VPN disconnect method
+### Core Files (Used by both UIKit and SwiftUI)
+- **KeychainHelper.swift** - Keychain service implementation
+- **vpnServer.swift** - Main VPN connection class
 - **Country.swift** - Server model and dummy data
-- **HomeController.swift:328-374** - VPN status change handler
-- **HomeController.swift:435-460** - VPN connection/disconnection handler
-- **VpnConfigrationController.swift:56-68** - Initial VPN setup
+
+### UIKit Implementation (All in One File)
+- **forUse/UIKitControllers.swift** - Complete UIKit implementation including:
+  - `BaseController` - Base controller class
+  - `HomeController` - Main screen and VPN control
+  - `VpnConfigrationController` - VPN initial setup screen
+  - `SelectCountryController` - Server selection screen
+  - UIKit usage examples and documentation
+
+### SwiftUI Implementation (All in One File)
+- **forUse/VPNSwiftUIViews.swift** - Complete SwiftUI implementation including:
+  - `VPNManager` - Observable VPN manager (lines ~15-200)
+  - `HomeView` - Main VPN screen (lines ~202-330)
+  - `SelectCountryView` - Server selection (lines ~332-385)
+  - `VPNConfigurationView` - Initial setup (lines ~387-490)
+  - SwiftUI usage examples and documentation (lines ~550+)
+
+### Original Individual Files (Optional - Can be Deleted)
+- **forUse/HomeController.swift** - Original HomeController (now in UIKitControllers.swift)
+- **forUse/VpnConfigrationController.swift** - Original VpnConfigrationController (now in UIKitControllers.swift)
+- **forUse/SelectCountryController.swift** - Original SelectCountryController (now in UIKitControllers.swift)
+
+## 🎯 Quick Getting Started Guide
+
+### Step 1: Choose Your UI Framework
+
+**UIKit** or **SwiftUI**? Pick one:
+
+```swift
+// UIKit - Copy this file to your project:
+forUse/UIKitControllers.swift
+
+// SwiftUI - Copy this file to your project:
+forUse/VPNSwiftUIViews.swift
+```
+
+### Step 2: Copy Core Files
+
+Always copy these 3 files:
+```
+KeychainHelper.swift
+vpnServer.swift
+Country.swift
+```
+
+### Step 3: Configure Xcode
+
+Enable these capabilities in your target:
+1. Personal VPN
+2. Keychain Sharing
+3. Network Extensions
+
+### Step 4: Start Coding
+
+**For UIKit:**
+```swift
+let homeVC = HomeController()
+navigationController?.pushViewController(homeVC, animated: true)
+```
+
+**For SwiftUI:**
+```swift
+@main
+struct MyApp: App {
+    var body: some Scene {
+        WindowGroup {
+            HomeView()
+        }
+    }
+}
+```
+
+### Step 5: Set Up Your VPN Server (If Needed)
+
+**Don't have a VPN server yet?** Set one up easily:
+
+👉 **Use this guide**: https://github.com/hwdsl2/setup-ipsec-vpn
+
+Takes only 5 minutes to set up on Ubuntu/Debian/CentOS!
+
+### Step 6: Configure Your VPN Server Credentials
+
+Update `Country.swift` with your server details:
+```swift
+Country(
+    id: "my-server",
+    name: "My VPN Server",
+    userName: "your-username",        // From VPN server setup
+    ip: "your-server-ip",            // Your server's IP address
+    shared: "your-shared-secret",    // IPsec PSK from setup
+    pass: "your-password"            // VPN password from setup
+)
+```
+
+**That's it! You're ready to go!** 🎉
 
 ## License
 
